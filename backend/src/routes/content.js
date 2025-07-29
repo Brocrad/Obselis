@@ -190,6 +190,43 @@ router.get('/statistics', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
+// Get watch history - must come before /:contentId route
+router.get('/watch-history', authenticateToken, applyUserRateLimit, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { limit = 20, offset = 0 } = req.query;
+    
+    const history = await database.query(`
+      SELECT wh.*, mc.title, mc.thumbnail_path, mc.media_type, mc.file_size
+      FROM watch_history wh
+      LEFT JOIN media_content mc ON wh.media_id = mc.id
+      WHERE wh.user_id = ?
+      ORDER BY wh.last_watched DESC
+      LIMIT ? OFFSET ?
+    `, [userId, parseInt(limit), parseInt(offset)]);
+    
+    res.json({ 
+      success: true, 
+      history: history.map(item => ({
+        id: item.id,
+        mediaId: item.media_id,
+        title: item.title,
+        currentTime: item.current_time,
+        duration: item.duration,
+        progressPercentage: item.progress_percentage,
+        completed: item.completed,
+        lastWatched: item.last_watched,
+        thumbnailPath: item.thumbnail_path,
+        mediaType: item.media_type,
+        fileSize: item.file_size
+      }))
+    });
+  } catch (error) {
+    console.error('Get watch history error:', error);
+    res.status(500).json({ error: 'Failed to get watch history' });
+  }
+});
+
 // Regenerate thumbnails (admins only)
 router.post('/regenerate-thumbnails', authenticateToken, requireAdmin, async (req, res) => {
   try {
@@ -804,41 +841,7 @@ router.get('/:contentId/watch-progress', authenticateToken, async (req, res) => 
   }
 });
 
-router.get('/watch-history', authenticateToken, applyUserRateLimit, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { limit = 20, offset = 0 } = req.query;
-    
-    const history = await database.query(`
-      SELECT wh.*, m.thumbnail_path, m.media_type, m.file_size
-      FROM watch_history wh
-      LEFT JOIN media m ON wh.media_id = m.id
-      WHERE wh.user_id = ?
-      ORDER BY wh.last_watched DESC
-      LIMIT ? OFFSET ?
-    `, [userId, parseInt(limit), parseInt(offset)]);
-    
-    res.json({ 
-      success: true, 
-      history: history.map(item => ({
-        id: item.id,
-        mediaId: item.media_id,
-        title: item.title,
-        currentTime: item.current_time,
-        duration: item.duration,
-        progressPercentage: item.progress_percentage,
-        completed: item.completed,
-        lastWatched: item.last_watched,
-        thumbnailPath: item.thumbnail_path,
-        mediaType: item.media_type,
-        fileSize: item.file_size
-      }))
-    });
-  } catch (error) {
-    console.error('Get watch history error:', error);
-    res.status(500).json({ error: 'Failed to get watch history' });
-  }
-});
+
 
 router.delete('/:contentId/watch-progress', authenticateToken, async (req, res) => {
   try {
