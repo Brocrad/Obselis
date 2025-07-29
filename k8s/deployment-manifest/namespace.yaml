@@ -1,0 +1,9 @@
+# Media Server Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media-server
+  labels:
+    name: media-server
+    app: archiveofobselis
+    environment: production 

@@ -1,0 +1,25 @@
+{
+  "name": "media-server-shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and types for the media server",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "test": "jest"
+  },
+  "dependencies": {
+    "joi": "^17.11.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/lodash": "^4.14.202",
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 

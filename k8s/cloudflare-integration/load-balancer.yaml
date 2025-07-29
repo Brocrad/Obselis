@@ -1,0 +1,41 @@
+# MetalLB Load Balancer for Cloudflare Integration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.200-192.168.1.250  # Adjust to your network range
+
+---
+# External Load Balancer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-server-lb
+  namespace: media-server
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "media-server"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local  # Preserve client IP for Cloudflare
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+  - name: media-streaming
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: media-server 

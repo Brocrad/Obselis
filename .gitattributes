@@ -1,0 +1,57 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# JavaScript files
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+# TypeScript files
+*.ts text eol=lf
+*.tsx text eol=lf
+# HTML files
+*.html text eol=lf
+*.htm text eol=lf
+# CSS files
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+# Markdown files
+*.md text eol=lf
+# YAML files
+*.yml text eol=lf
+*.yaml text eol=lf
+# Configuration files
+*.env* text eol=lf
+*.config.js text eol=lf
+*.config.json text eol=lf
+# Shell scripts
+*.sh text eol=lf
+# Docker files
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+# Binary files (should not be modified)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.avi binary
+*.mkv binary
+*.wmv binary
+*.flv binary
+*.webm binary
+*.mp3 binary
+*.wav binary
+*.flac binary
+*.zip binary
+*.tar.gz binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+# Database files
+*.db binary
+*.sqlite binary
+*.sqlite3 binary

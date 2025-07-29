@@ -1,0 +1,79 @@
+# Cloudflare Integration - Ingress Configuration
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: media-server-ingress
+  namespace: media-server
+  annotations:
+    # Traefik ingress controller annotations
+    kubernetes.io/ingress.class: "traefik"
+    
+    # SSL/TLS configuration for Cloudflare
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # Security headers for Cloudflare
+    traefik.ingress.kubernetes.io/headers:
+      custom-request-headers: "X-Forwarded-Proto:https"
+      custom-response-headers: |
+        X-Frame-Options: DENY
+        X-Content-Type-Options: nosniff
+        Referrer-Policy: strict-origin-when-cross-origin
+        Permissions-Policy: camera=(), microphone=(), geolocation=()
+    
+    # Rate limiting
+    traefik.ingress.kubernetes.io/rate-limit: |
+      burst: 100
+      average: 50
+    
+    # CORS for media streaming
+    traefik.ingress.kubernetes.io/cors-headers: |
+      Access-Control-Allow-Origin: https://yourdomain.com
+      Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+      Access-Control-Allow-Headers: Content-Type, Authorization
+      Access-Control-Allow-Credentials: true
+
+spec:
+  tls:
+  - hosts:
+    - yourdomain.com
+    - www.yourdomain.com
+    - api.yourdomain.com
+    - media.yourdomain.com
+    secretName: media-server-tls
+  
+  rules:
+  # Main website
+  - host: yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  
+  # API endpoints
+  - host: api.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 3001
+  
+  # Media streaming
+  - host: media.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: media-service
+            port:
+              number: 3001 

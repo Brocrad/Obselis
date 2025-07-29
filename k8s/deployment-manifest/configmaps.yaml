@@ -1,0 +1,53 @@
+# Application Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: media-server-config
+  namespace: media-server
+data:
+  # Domain configuration
+  DOMAIN: "archiveofobselis.com"
+  API_DOMAIN: "api.archiveofobselis.com"
+  MEDIA_DOMAIN: "media.archiveofobselis.com"
+  
+  # Database configuration
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "media_server"
+  DB_TYPE: "postgresql"
+  
+  # Redis configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # Media storage paths
+  MEDIA_UPLOAD_DIR: "/app/uploads/media"
+  MEDIA_THUMBNAIL_DIR: "/app/uploads/thumbnails"
+  MEDIA_TRANSCODED_DIR: "/app/uploads/transcoded"
+  MEDIA_TEMP_DIR: "/app/uploads/temp"
+  
+  # Transcoding configuration
+  MAX_CONCURRENT_JOBS: "2"
+  GPU_MEMORY_LIMIT: "4G"
+  ENABLE_GPU: "true"
+  
+  # Security configuration
+  NODE_ENV: "production"
+  CORS_ORIGIN: "https://archiveofobselis.com"
+  
+  # Cloudflare configuration
+  CLOUDFLARE_PROXY: "true"
+  TRUST_PROXY: "true"
+
+---
+# Frontend Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: media-server
+data:
+  VITE_API_URL: "https://api.archiveofobselis.com/api"
+  VITE_MEDIA_URL: "https://media.archiveofobselis.com"
+  VITE_APP_NAME: "Archive of Obselis"
+  VITE_APP_VERSION: "1.0.0" 

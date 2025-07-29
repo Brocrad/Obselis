@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obselis Desktop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Custom Title Bar -->
+    <div class="title-bar">
+        <div class="title-bar-left">
+            <span class="app-title">Obselis Desktop</span>
+        </div>
+        <div class="title-bar-right">
+            <button id="minimizeBtn" class="title-bar-btn">−</button>
+            <button id="closeBtn" class="title-bar-btn">×</button>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Connecting to Obselis...</p>
+        </div>
+    </div>
+
+    <!-- Connection Error Screen -->
+    <div id="connectionError" class="screen hidden">
+        <div class="error-container">
+            <h2>Connection Error</h2>
+            <p>Unable to connect to the Obselis server</p>
+            <div class="server-config">
+                <label for="serverUrl">Server URL:</label>
+                <input type="text" id="serverUrl" placeholder="http://localhost:3001">
+                <button id="reconnectBtn" class="btn-primary">Reconnect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <span class="brand-icon">🎬</span>
+                    <span class="brand-text">Obselis</span>
+                </div>
+            </div>
+            <div class="nav-center">
+                <div class="nav-links">
+                    <a href="#" class="nav-link active" data-page="home">Home</a>
+                    <a href="#" class="nav-link" data-page="movies">Movies</a>
+                    <a href="#" class="nav-link" data-page="tv-shows">TV Shows</a>
+                    <a href="#" class="nav-link" data-page="offline">Offline</a>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="connection-status">
+                    <div id="connectionStatus" class="status-indicator"></div>
+                    <span class="status-text">Connected</span>
+                </div>
+                <div class="user-menu">
+                    <button class="user-avatar" id="userMenuBtn">
+                        <span id="userInitials">U</span>
+                    </button>
+                    <div class="user-dropdown hidden" id="userDropdown">
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role" id="userRole">User</div>
+                        </div>
+                        <hr class="dropdown-divider">
+                        <button class="dropdown-item" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Home Page -->
+            <div id="homePage" class="page active">
+                <!-- Welcome Header -->
+                <div class="welcome-header">
+                    <div class="welcome-text">
+                        <h1 class="welcome-title" id="welcomeTitle">Good morning, User!</h1>
+                        <p class="welcome-subtitle">Welcome to your personal media server</p>
+                        <p class="welcome-date" id="welcomeDate"></p>
+                    </div>
+                    <div class="system-status">
+                        <div class="status-item">
+                            <div class="status-dot online"></div>
+                            <span class="status-label">System Online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div id="quickStats" class="stats-grid hidden">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Total Content</span>
+                            <span class="stat-icon">📚</span>
+                        </div>
+                        <div class="stat-value" id="totalContent">0</div>
+                        <div class="stat-meta" id="totalSize">0 GB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Space Saved</span>
+                            <span class="stat-icon">💾</span>
+                        </div>
+                        <div class="stat-value" id="spaceSaved">0 GB</div>
+                        <div class="stat-meta" id="compressionRatio">0% compression</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Transcoding Queue</span>
+                            <span class="stat-icon">🎬</span>
+                        </div>
+                        <div class="stat-value" id="queueLength">0</div>
+                        <div class="stat-meta" id="queueStatus">Idle</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Your Role</span>
+                            <span class="stat-icon">👤</span>
+                        </div>
+                        <div class="stat-value" id="userRoleDisplay">User</div>
+                        <div class="stat-meta" id="accessLevel">Viewer</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="action-card movies-card" data-page="movies">
+                        <div class="action-header">
+                            <span class="action-title">Movies</span>
+                            <span class="action-icon">🎬</span>
+                        </div>
+                        <p class="action-description">Browse and watch your movie collection</p>
+                        <div class="action-link">Explore Movies →</div>
+                    </div>
+                    <div class="action-card tv-shows-card" data-page="tv-shows">
+                        <div class="action-header">
+                            <span class="action-title">TV Shows</span>
+                            <span class="action-icon">📺</span>
+                        </div>
+                        <p class="action-description">Discover series and episodes</p>
+                        <div class="action-link">Browse Shows →</div>
+                    </div>
+                    <div class="action-card offline-card" data-page="offline">
+                        <div class="action-header">
+                            <span class="action-title">Offline Library</span>
+                            <span class="action-icon">📱</span>
+                        </div>
+                        <p class="action-description">Access your downloaded content</p>
+                        <div class="action-link">Browse Offline →</div>
+                    </div>
+                </div>
+
+                <!-- Recent Content -->
+                <div id="recentContent" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recently Added</h2>
+                        <button class="section-link" data-page="movies">View All →</button>
+                    </div>
+                    <div id="recentGrid" class="content-grid"></div>
+                </div>
+            </div>
+
+            <!-- Movies Page -->
+            <div id="moviesPage" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">Movies</h1>
+                    <div class="page-controls">
+                        <input type="text" id="movieSearch" class="search-input" placeholder="Search movies...">
+                    </div>
+                </div>
+                <div id="moviesGrid" class="content-grid"></div>
+                <div id="noMovies" class="no-content hidden">
+                    <div class="no-content-icon">🎬</div>
+                    <h3>No Movies Found</h3>
+                    <p>No movies available in your library</p>
+                </div>
+            </div>
+
+            <!-- TV Shows Page -->
+            <div id="tvShowsPage" class="page">
+                <!-- Series Library View -->
+                <div id="seriesLibraryView" class="tv-view active">
+                    <div class="page-header">
+                        <h1 class="page-title">TV Shows</h1>
+                        <div class="page-controls">
+                            <input type="text" id="tvSearch" class="search-input" placeholder="Search TV shows...">
+                        </div>
+                    </div>
+                    <div id="seriesGrid" class="content-grid"></div>
+                    <div id="noTVShows" class="no-content hidden">
+                        <div class="no-content-icon">📺</div>
+                        <h3>No TV Shows Found</h3>
+                        <p>No TV shows available in your library</p>
+                    </div>
+                </div>
+
+                <!-- Series Detail View -->
+                <div id="seriesDetailView" class="tv-view">
+                    <div class="series-header">
+                        <button id="backToSeriesLibrary" class="back-button">← Back to TV Shows</button>
+                        <div class="series-info">
+                            <div class="series-poster">
+                                <div class="series-thumbnail" id="seriesThumbnail">📺</div>
+                            </div>
+                            <div class="series-details">
+                                <h1 id="seriesTitle" class="series-title">Series Title</h1>
+                                <div class="series-meta">
+                                    <span id="seriesEpisodeCount">0 Episodes</span>
+                                    <span id="seriesSeasonCount">0 Seasons</span>
+                                </div>
+                                <p id="seriesDescription" class="series-description">Click on a TV show to see episodes organized by season</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="season-controls">
+                        <label for="seasonSelect" class="season-label">Season:</label>
+                        <select id="seasonSelect" class="season-select">
+                            <option value="1">Season 1</option>
+                        </select>
+                        <span id="currentSeasonInfo" class="season-info">0 episodes</span>
+                    </div>
+                    
+                    <div id="episodesGrid" class="episodes-grid"></div>
+                    
+                    <div id="noEpisodes" class="no-content hidden">
+                        <div class="no-content-icon">📺</div>
+                        <h3>No Episodes Found</h3>
+                        <p>No episodes available for this season</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offline Library Page -->
+            <div id="offlinePage" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">Offline Library</h1>
+                    <div class="offline-tabs">
+                        <button class="offline-tab active" data-offline-tab="movies">Movies</button>
+                        <button class="offline-tab" data-offline-tab="tv-shows">TV Shows</button>
+                    </div>
+                </div>
+
+                <!-- Offline Movies Tab -->
+                <div id="offlineMoviesTab" class="offline-tab-content active">
+                    <div class="tab-controls">
+                        <input type="text" id="offlineMovieSearch" class="search-input" placeholder="Search offline movies...">
+                    </div>
+                    <div id="offlineMoviesGrid" class="content-grid"></div>
+                    <div id="noOfflineMovies" class="no-content hidden">
+                        <div class="no-content-icon">🎬</div>
+                        <h3>No Offline Movies</h3>
+                        <p>Download movies to watch them offline</p>
+                    </div>
+                </div>
+
+                <!-- Offline TV Shows Tab -->
+                <div id="offlineTVShowsTab" class="offline-tab-content">
+                    <!-- Series Library View -->
+                    <div id="offlineSeriesLibraryView" class="tv-view active">
+                        <div class="tab-controls">
+                            <input type="text" id="offlineTVSearch" class="search-input" placeholder="Search offline TV shows...">
+                        </div>
+                        <div id="offlineSeriesGrid" class="content-grid"></div>
+                        <div id="noOfflineTVShows" class="no-content hidden">
+                            <div class="no-content-icon">📺</div>
+                            <h3>No Offline TV Shows</h3>
+                            <p>Download TV show episodes to watch them offline</p>
+                        </div>
+                    </div>
+
+                    <!-- Series Detail View -->
+                    <div id="offlineSeriesDetailView" class="tv-view">
+                        <div class="series-header">
+                            <button id="backToOfflineSeriesLibrary" class="back-button">← Back to Offline TV Shows</button>
+                            <div class="series-info">
+                                <div class="series-poster">
+                                    <div class="series-thumbnail" id="offlineSeriesThumbnail">📺</div>
+                                </div>
+                                <div class="series-details">
+                                    <h1 id="offlineSeriesTitle" class="series-title">Series Title</h1>
+                                    <div class="series-meta">
+                                        <span id="offlineSeriesEpisodeCount">0 Episodes</span>
+                                        <span id="offlineSeriesSeasonCount">0 Seasons</span>
+                                    </div>
+                                    <p id="offlineSeriesDescription" class="series-description">Downloaded episodes organized by season</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="season-controls">
+                            <label for="offlineSeasonSelect" class="season-label">Season:</label>
+                            <select id="offlineSeasonSelect" class="season-select">
+                                <option value="1">Season 1</option>
+                            </select>
+                            <span id="offlineCurrentSeasonInfo" class="season-info">0 episodes</span>
+                        </div>
+                        
+                        <div id="offlineEpisodesGrid" class="episodes-grid"></div>
+                        
+                        <div id="noOfflineEpisodes" class="no-content hidden">
+                            <div class="no-content-icon">📺</div>
+                            <h3>No Offline Episodes</h3>
+                            <p>No downloaded episodes available for this season</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Media Player Modal -->
+    <div id="mediaPlayer" class="media-player-overlay hidden">
+        <div class="media-player-container">
+            <button id="closePlayer" class="close-player-btn">✕</button>
+            <div class="media-content">
+                <video id="videoPlayer" class="media-element" controls style="display: none;">
+                    Your browser does not support the video tag.
+                </video>
+                <audio id="audioPlayer" class="media-element" controls style="display: none;">
+                    Your browser does not support the audio tag.
+                </audio>
+                <img id="imagePlayer" class="media-element" style="display: none;" alt="Image">
+                <div id="documentPlayer" class="document-player" style="display: none;">
+                    <div class="document-icon">📄</div>
+                    <h3 id="documentTitle">Document</h3>
+                    <button id="downloadDocument" class="download-btn">Download File</button>
+                </div>
+            </div>
+            <div id="mediaInfo" class="media-info">
+                <h3 id="mediaTitle">Media Title</h3>
+                <p id="mediaDescription">Media description</p>
+                <div class="media-meta">
+                    <span id="mediaType">Type</span>
+                    <span id="mediaSize">Size</span>
+                    <span id="mediaDuration">Duration</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html> 

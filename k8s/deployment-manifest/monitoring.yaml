@@ -1,0 +1,129 @@
+# Monitoring Configuration
+# Prometheus ServiceMonitor for backend metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-monitor
+  namespace: media-server
+  labels:
+    app: backend
+    component: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+
+---
+# Grafana Dashboard ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: media-server
+  labels:
+    app: grafana
+    component: monitoring
+data:
+  media-server-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Archive of Obselis - Media Server Dashboard",
+        "panels": [
+          {
+            "title": "Transcoding Jobs",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "transcoding_jobs_total",
+                "legendFormat": "Total Jobs"
+              }
+            ]
+          },
+          {
+            "title": "GPU Utilization",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "gpu_utilization_percent",
+                "legendFormat": "GPU {{gpu}}"
+              }
+            ]
+          },
+          {
+            "title": "Storage Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "storage_usage_bytes",
+                "legendFormat": "{{storage_type}}"
+              }
+            ]
+          },
+          {
+            "title": "Active Users",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "active_users_total",
+                "legendFormat": "Active Users"
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+---
+# Prometheus Alert Rules
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: media-server-alerts
+  namespace: media-server
+  labels:
+    app: prometheus
+    component: monitoring
+spec:
+  groups:
+  - name: media-server
+    rules:
+    - alert: HighGPUUtilization
+      expr: gpu_utilization_percent > 90
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High GPU utilization on {{$labels.gpu}}"
+        description: "GPU utilization is above 90% for 5 minutes"
+    
+    - alert: TranscodingJobFailure
+      expr: transcoding_jobs_failed_total > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Transcoding job failure detected"
+        description: "Transcoding job has failed"
+    
+    - alert: StorageSpaceLow
+      expr: storage_usage_percent > 85
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Storage space running low"
+        description: "Storage usage is above 85%"
+    
+    - alert: DatabaseConnectionError
+      expr: database_connection_errors_total > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Database connection errors"
+        description: "Database connection errors detected" 

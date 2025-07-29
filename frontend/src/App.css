@@ -1,0 +1,203 @@
+.App {
+  text-align: center;
+}
+
+/* Custom styles for the media server */
+.video-player {
+  width: 100%;
+  height: auto;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.media-card {
+  background: #374151;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.media-card:hover {
+  transform: scale(1.05);
+} 
+
+/* Mobile Video Player Improvements */
+@media (max-width: 768px) {
+  .video-player-container {
+    /* Prevent zoom on double tap */
+    touch-action: manipulation;
+  }
+  
+  /* Larger touch targets for mobile */
+  .video-controls button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+  
+  /* Better progress bar for mobile */
+  .video-progress-bar {
+    height: 8px;
+    touch-action: none;
+  }
+  
+  .video-progress-bar:hover {
+    height: 12px;
+  }
+  
+  /* Prevent text selection on controls */
+  .video-controls {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Mobile video element improvements */
+  .mobile-video {
+    /* Better mobile video handling */
+    -webkit-playsinline: true;
+    -webkit-presentation-mode: inline;
+    /* Prevent iOS Safari from entering fullscreen automatically */
+    -webkit-video-playable-inline: true;
+  }
+  
+  /* Landscape mode styles */
+  .landscape-mode {
+    /* Optimize for landscape viewing */
+    background: #000;
+  }
+  
+  .landscape-mode .mobile-video {
+    /* Full screen in landscape */
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+  }
+}
+
+/* Landscape orientation specific styles */
+@media (max-width: 768px) and (orientation: landscape) {
+  .video-player-container {
+    /* Full screen in landscape */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: #000;
+  }
+  
+  .landscape-mode {
+    /* Ensure video takes full screen in landscape */
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .landscape-mode .mobile-video {
+    /* Optimize video for landscape */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Hide controls in landscape for cleaner experience */
+  .video-controls {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .video-controls:hover,
+  .video-controls.show {
+    opacity: 1;
+  }
+}
+
+/* Fullscreen styles for mobile */
+@media (max-width: 768px) {
+  /* Fullscreen video container */
+  .video-player-container:fullscreen,
+  .video-player-container:-webkit-full-screen,
+  .video-player-container:-moz-full-screen {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Fullscreen video element */
+  .mobile-video:fullscreen,
+  .mobile-video:-webkit-full-screen,
+  .mobile-video:-moz-full-screen {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+  }
+  
+  /* Better touch targets for fullscreen button */
+  .fullscreen-button {
+    min-width: 48px;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+  
+  /* Prevent zoom on double tap in fullscreen */
+  .video-player-container:fullscreen video,
+  .video-player-container:-webkit-full-screen video,
+  .video-player-container:-moz-full-screen video {
+    touch-action: manipulation;
+  }
+  
+  /* Forced landscape mode for rotation-locked devices */
+  body.force-landscape {
+    overflow: hidden;
+  }
+  
+  /* Hide the original video player when in landscape mode */
+  body.force-landscape .video-player-container {
+    display: none;
+  }
+}
+
+/* Custom slider styling */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: rgba(255, 255, 255, 0.2);
+  height: 4px;
+  border-radius: 2px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: white;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider::-moz-range-track {
+  background: rgba(255, 255, 255, 0.2);
+  height: 4px;
+  border-radius: 2px;
+}
+
+.slider::-moz-range-thumb {
+  background: white;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+} 

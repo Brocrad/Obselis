@@ -1,0 +1,338 @@
+/* Mobile-specific optimizations */
+
+/* Improve touch targets */
+@media (max-width: 768px) {
+  /* Ensure minimum touch target size of 44px */
+  button, 
+  input[type="button"], 
+  input[type="submit"], 
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better form input styling for mobile */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Improve table scrolling on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better spacing for mobile cards */
+  .mobile-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  /* Improve button spacing on mobile */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-button-group button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  /* Storage optimization specific mobile styles */
+  .btn-modern {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent text from being too small on mobile */
+  .text-xs {
+    font-size: 0.75rem !important;
+  }
+
+  /* Ensure proper spacing for cards on mobile */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .space-y-6 > * + * {
+      margin-top: 1rem;
+    }
+  }
+
+  /* Better padding for mobile cards */
+  .bg-slate-800 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  @media (min-width: 640px) {
+    .bg-slate-800 {
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+    }
+  }
+
+  /* Improve readability of statistics on mobile */
+  .grid.grid-cols-2 {
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .grid.grid-cols-2 {
+      gap: 1rem;
+    }
+  }
+
+  /* Admin page specific mobile optimizations */
+  .card-modern {
+    padding: 1rem !important;
+  }
+
+  @media (min-width: 640px) {
+    .card-modern {
+      padding: 1.5rem !important;
+    }
+  }
+
+  /* Ensure text doesn't get too small on mobile */
+  @media (max-width: 640px) {
+    .text-5xl {
+      font-size: 2rem !important;
+    }
+    
+    .text-3xl {
+      font-size: 1.5rem !important;
+    }
+    
+    .text-2xl {
+      font-size: 1.25rem !important;
+    }
+  }
+
+  /* Improve modal sizing on mobile */
+  @media (max-width: 768px) {
+    .fixed.inset-0 .max-w-6xl {
+      max-width: 95vw !important;
+      margin: 0.5rem;
+    }
+    
+    .max-h-\[90vh\] {
+      max-height: 85vh !important;
+    }
+  }
+
+  /* Better spacing for mobile layouts */
+  @media (max-width: 640px) {
+    .space-y-8 > * + * {
+      margin-top: 1.5rem !important;
+    }
+    
+    .space-y-6 > * + * {
+      margin-top: 1rem !important;
+    }
+    
+    .space-y-4 > * + * {
+      margin-top: 0.75rem !important;
+    }
+  }
+
+  /* User management mobile optimizations */
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 0.25rem 0.5rem;
+  }
+
+  @media (max-width: 1024px) {
+    .role-badge {
+      min-width: 1.5rem;
+      min-height: 1.5rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Mobile user cards */
+  @media (max-width: 1024px) {
+    .user-card-actions button {
+      min-height: 44px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+    }
+    
+    .user-card-delete {
+      min-height: 48px;
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Improved touch targets for mobile admin */
+  @media (max-width: 768px) {
+    .admin-sidebar button {
+      min-height: 48px;
+      padding: 0.75rem 1rem;
+    }
+    
+    .mobile-menu-toggle {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Better modal/dialog sizing on mobile */
+  .mobile-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+
+  /* Improve text readability */
+  .mobile-text {
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+
+  /* Better spacing for mobile navigation */
+  .mobile-nav {
+    padding: 1rem;
+  }
+
+  .mobile-nav-item {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.5rem;
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  /* Improve form layout on mobile */
+  .mobile-form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .mobile-form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* Better tab navigation for mobile */
+  .mobile-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  .mobile-tab {
+    display: inline-block;
+    padding: 0.75rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 0.5rem;
+    white-space: nowrap;
+  }
+}
+
+/* Landscape phone optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+  .landscape-compact {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* Very small screens (older phones) */
+@media (max-width: 375px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .small-screen-text {
+    font-size: 0.875rem;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Ensure crisp images and icons */
+  img, svg {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode improvements for mobile */
+@media (prefers-color-scheme: dark) {
+  /* Better contrast for mobile dark mode */
+  .dark-mobile-text {
+    color: #e5e7eb;
+  }
+
+  .dark-mobile-bg {
+    background-color: #1f2937;
+  }
+}
+
+/* Accessibility improvements for mobile */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus improvements for mobile */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Better scrollbar styling for mobile webkit */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+} 

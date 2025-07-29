@@ -1,0 +1,293 @@
+# Backend API Server Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+  namespace: media-server
+  labels:
+    app: backend
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        component: api
+    spec:
+      containers:
+      - name: backend
+        image: archiveofobselis/backend:latest
+        ports:
+        - containerPort: 3001
+          name: http
+        env:
+        # Database configuration
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: DB_NAME
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: DB_TYPE
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: DB_PASSWORD
+        
+        # Redis configuration
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: REDIS_PORT
+        
+        # Media storage paths
+        - name: MEDIA_UPLOAD_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: MEDIA_UPLOAD_DIR
+        - name: MEDIA_THUMBNAIL_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: MEDIA_THUMBNAIL_DIR
+        - name: MEDIA_TRANSCODED_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: MEDIA_TRANSCODED_DIR
+        - name: MEDIA_TEMP_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: MEDIA_TEMP_DIR
+        
+        # Transcoding configuration
+        - name: MAX_CONCURRENT_JOBS
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: MAX_CONCURRENT_JOBS
+        - name: GPU_MEMORY_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: GPU_MEMORY_LIMIT
+        - name: ENABLE_GPU
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: ENABLE_GPU
+        
+        # Security configuration
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: NODE_ENV
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: CORS_ORIGIN
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: JWT_SECRET
+        
+        # Cloudflare configuration
+        - name: CLOUDFLARE_PROXY
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: CLOUDFLARE_PROXY
+        - name: TRUST_PROXY
+          valueFrom:
+            configMapKeyRef:
+              name: media-server-config
+              key: TRUST_PROXY
+        
+        # API keys
+        - name: TMDB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: TMDB_API_KEY
+        - name: OMDB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: OMDB_API_KEY
+        
+        # Email configuration
+        - name: EMAIL_HOST
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: EMAIL_HOST
+        - name: EMAIL_USER
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: EMAIL_USER
+        - name: EMAIL_PASS
+          valueFrom:
+            secretKeyRef:
+              name: media-server-secrets
+              key: EMAIL_PASS
+        
+        volumeMounts:
+        - name: media-storage
+          mountPath: /app/uploads/media
+        - name: thumbnail-storage
+          mountPath: /app/uploads/thumbnails
+        - name: transcoded-storage
+          mountPath: /app/uploads/transcoded
+        - name: temp-storage
+          mountPath: /app/uploads/temp
+        
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+      
+      volumes:
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-files-pvc
+      - name: thumbnail-storage
+        persistentVolumeClaim:
+          claimName: thumbnails-pvc
+      - name: transcoded-storage
+        persistentVolumeClaim:
+          claimName: transcoded-files-pvc
+      - name: temp-storage
+        persistentVolumeClaim:
+          claimName: temp-files-pvc
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: media-server
+  labels:
+    app: backend
+    component: api
+spec:
+  ports:
+  - port: 3001
+    targetPort: 3001
+    name: http
+  selector:
+    app: backend
+  type: ClusterIP
+
+---
+# Persistent Volume Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-files-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 2Ti
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: thumbnails-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transcoded-files-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-storage
+  resources:
+    requests:
+      storage: 1Ti
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: temp-files-pvc
+  namespace: media-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 500Gi 

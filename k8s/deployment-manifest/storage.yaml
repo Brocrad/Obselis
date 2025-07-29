@@ -1,0 +1,155 @@
+# Storage Configuration for Media Server
+# Persistent Volumes for different data types
+
+---
+# Media Files Storage
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-files-pv
+  namespace: media-server
+  labels:
+    type: media-storage
+spec:
+  capacity:
+    storage: 2Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storage
+  nfs:
+    server: 192.168.1.103  # Raspberry Pi NAS IP
+    path: /mnt/m2/media
+  mountOptions:
+    - nfsvers=4
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - timeo=600
+    - retrans=2
+
+---
+# Database Storage
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: database-pv
+  namespace: media-server
+  labels:
+    type: database-storage
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storage
+  nfs:
+    server: 192.168.1.103  # Raspberry Pi NAS IP
+    path: /mnt/m2/database
+  mountOptions:
+    - nfsvers=4
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - timeo=600
+    - retrans=2
+
+---
+# Transcoded Files Storage
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transcoded-files-pv
+  namespace: media-server
+  labels:
+    type: transcoded-storage
+spec:
+  capacity:
+    storage: 1Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storage
+  nfs:
+    server: 192.168.1.103  # Raspberry Pi NAS IP
+    path: /mnt/m2/transcoded
+  mountOptions:
+    - nfsvers=4
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - timeo=600
+    - retrans=2
+
+---
+# Thumbnails Storage
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: thumbnails-pv
+  namespace: media-server
+  labels:
+    type: thumbnail-storage
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-storage
+  nfs:
+    server: 192.168.1.103  # Raspberry Pi NAS IP
+    path: /mnt/m2/thumbnails
+  mountOptions:
+    - nfsvers=4
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - timeo=600
+    - retrans=2
+
+---
+# Temporary Files Storage (Local SSD for performance)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: temp-files-pv
+  namespace: media-server
+  labels:
+    type: temp-storage
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: fast-ssd
+  hostPath:
+    path: /mnt/ssd/temp
+    type: DirectoryOrCreate
+
+---
+# Storage Classes
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-storage
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: k8s.io/minikube-hostpath
+parameters:
+  type: pd-ssd
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+provisioner: k8s.io/minikube-hostpath
+parameters:
+  type: pd-ssd
+reclaimPolicy: Delete
+allowVolumeExpansion: true 
