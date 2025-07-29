@@ -200,9 +200,9 @@ router.get('/watch-history', authenticateToken, applyUserRateLimit, async (req, 
       SELECT wh.*, mc.title, mc.thumbnail_path, mc.media_type, mc.file_size
       FROM watch_history wh
       LEFT JOIN media_content mc ON wh.media_id = mc.id
-      WHERE wh.user_id = ?
+      WHERE wh.user_id = $1
       ORDER BY wh.last_watched DESC
-      LIMIT ? OFFSET ?
+      LIMIT $2 OFFSET $3
     `, [userId, parseInt(limit), parseInt(offset)]);
     
     res.json({ 
@@ -365,7 +365,7 @@ router.get('/:contentId/stream', applyStreamingLimiter, async (req, res) => {
       if (isSignificantChunk) {
         // ENFORCEMENT: Check per-user bandwidth limit only for significant video chunks
         const userSessions = await database.query(
-          'SELECT SUM(bandwidth) as total_bandwidth FROM streaming_sessions WHERE user_id = ? AND status = ?',
+          'SELECT SUM(bandwidth) as total_bandwidth FROM streaming_sessions WHERE user_id = $1 AND status = $2',
           [user.id, 'active']
         );
         const currentUserBandwidth = userSessions[0]?.total_bandwidth || 0;
@@ -422,7 +422,7 @@ router.get('/:contentId/stream', applyStreamingLimiter, async (req, res) => {
       
       if (chunkSize > 1024 * 1024) {
         const userSessions = await database.query(
-          'SELECT SUM(bandwidth) as total_bandwidth FROM streaming_sessions WHERE user_id = ? AND status = ?',
+          'SELECT SUM(bandwidth) as total_bandwidth FROM streaming_sessions WHERE user_id = $1 AND status = $2',
           [user.id, 'active']
         );
         const currentUserBandwidth = userSessions[0]?.total_bandwidth || 0;
@@ -778,7 +778,7 @@ router.post('/:contentId/watch-progress', authenticateToken, applyUserRateLimit,
     // Upsert watch history using PostgreSQL syntax
     await database.query(`
       INSERT INTO watch_history (user_id, media_id, title, current_time, duration, progress_percentage, completed, last_watched, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
       ON CONFLICT (user_id, media_id) DO UPDATE SET 
         current_time = EXCLUDED.current_time,
         duration = EXCLUDED.duration,
@@ -811,7 +811,7 @@ router.get('/:contentId/watch-progress', authenticateToken, async (req, res) => 
     const userId = req.user.id;
     
     const history = await database.query(
-      'SELECT * FROM watch_history WHERE user_id = ? AND media_id = ?',
+      'SELECT * FROM watch_history WHERE user_id = $1 AND media_id = $2',
       [userId, contentId]
     );
     
@@ -849,7 +849,7 @@ router.delete('/:contentId/watch-progress', authenticateToken, async (req, res) 
     const userId = req.user.id;
     
     await database.query(
-      'DELETE FROM watch_history WHERE user_id = ? AND media_id = ?',
+      'DELETE FROM watch_history WHERE user_id = $1 AND media_id = $2',
       [userId, contentId]
     );
     
